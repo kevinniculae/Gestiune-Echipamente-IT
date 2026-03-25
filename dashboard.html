@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">📊 Dashboard General</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3 shadow">
+            <div class="card-header">Total Echipamente</div>
+            <div class="card-body">
+                <h1 class="card-title display-4 fw-bold">{{total}}</h1> <p class="card-text">Înregistrate în sistem</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3 shadow">
+            <div class="card-header">Funcționale</div>
+            <div class="card-body">
+                <h1 class="card-title display-4 fw-bold">{{active}}</h1>
+                <p class="card-text">Status: Activ</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-danger mb-3 shadow">
+            <div class="card-header">Defecte / În Service</div>
+            <div class="card-body">
+                <h1 class="card-title display-4 fw-bold">{{defecte}}</h1>
+                <p class="card-text">Necesită atenție</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+            <div class="card text-white bg-info mb-3 shadow">
+                <div class="card-header">Intervenții Luna Asta</div>
+                <div class="card-body">
+                    <h5 class="card-title display-4">{{ interventii_luna }}</h5>
+                    <p class="card-text">Reparații efectuate în ultima lună.</p>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

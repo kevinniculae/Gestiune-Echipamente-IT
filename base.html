@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiune IT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="bg-light">
+
+    <div class="d-flex" id="wrapper">
+        
+        {% if session.get('role') == 'admin' %}
+        {% if session.get('role') == 'admin' %}
+        <div class="bg-dark border-end" id="sidebar-wrapper" style="min-width: 250px; max-width: 250px; min-height: 100vh;">
+            <div class="sidebar-heading text-white p-3 fw-bold">ADMINISTRATOR</div>
+            <div class="list-group list-group-flush">
+                
+                <a href="{{ url_for('dashboard') }}" 
+                   class="list-group-item list-group-item-action {% if request.endpoint == 'dashboard' %} active {% else %} bg-dark text-white {% endif %}">
+                   🏠 Dashboard
+                </a>
+
+                <a href="{{ url_for('echipamente') }}" 
+                   class="list-group-item list-group-item-action {% if request.endpoint == 'echipamente' %} active {% else %} bg-dark text-white {% endif %}">
+                   🖥 Echipamente
+                </a>
+
+                <a href="{{ url_for('users') }}" 
+                   class="list-group-item list-group-item-action {% if request.endpoint == 'users' %} active {% else %} bg-dark text-white {% endif %}">
+                   👥 Angajați
+                </a>
+
+                <a href="{{ url_for('locatii') }}" 
+                   class="list-group-item list-group-item-action {% if request.endpoint == 'locatii' %} active {% else %} bg-dark text-white {% endif %}">
+                   📍 Locații
+                </a>
+
+                <a href="{{ url_for('all_interventii') }}" 
+                   class="list-group-item list-group-item-action {% if request.endpoint == 'all_interventii' %} active {% else %} bg-dark text-white {% endif %}">
+                   🛠 Service Global
+                </a>
+
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <div id="page-content-wrapper" style="width: 100%;">
+            
+            <nav class="navbar navbar-expand-lg border-bottom 
+            {% if session.get('role') == 'admin' %} 
+                navbar-light bg-light 
+            {% else %} 
+                navbar-dark bg-primary shadow-sm 
+            {% endif %}">
+                
+                <div class="container-fluid">
+                    {% if session.get('role') == 'admin' %}
+                        <span class="navbar-text">Logat ca: <strong>Administrator</strong></span>
+                    {% else %}
+                        <a class="navbar-brand" href="{{ url_for('profil_meu') }}">🖥 Gestiune IT - Angajat</a>
+                        <div class="d-flex">
+                            <span class="navbar-text text-white me-3">Salut, {{ session.get('nume') }}</span>
+                            <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-light">Deconectare</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </nav>
+
+            <div class="p-4">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

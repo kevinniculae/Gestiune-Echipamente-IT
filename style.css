@@ -1,0 +1,17 @@
+
+:root {
+    --primary-color: #0d47a1;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+}
+
+.btn-primary, .list-group-item.active {
+    background-color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+}
+
+#page-content-wrapper {
+    width: 100%;
+}

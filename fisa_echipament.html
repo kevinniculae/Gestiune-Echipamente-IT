@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-6">
+            {% if session.get('role') == 'admin' %}
+                <a href="/echipamente" class="btn btn-secondary">← Înapoi la Listă (Admin)</a>
+            {% else %}
+                <a href="/profil" class="btn btn-secondary">← Înapoi la Profilul Meu</a>
+            {% endif %}
+        </div>
+        <div class="col-6 text-end">
+            <button class="btn btn-warning" onclick="window.print()">🖨️ Printează Fișa</button>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h4>Fișă Echipament: {{ echipament.denumire }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nr. Inventar:</strong> {{ echipament.nr_inventar }}</p>
+                    <p><strong>Tip:</strong> {{ echipament.tip }}</p>
+                    <p><strong>Modalitate Dobândire:</strong> {{ echipament.modalitate_dobandire }}</p>
+                    <p><strong>Status:</strong> 
+                        {% if echipament.activ %}
+                            <span class="badge bg-success">Activ</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactiv</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <p><strong>Locație:</strong> {{ echipament.locatie }}</p>
+                    <p><strong>Utilizator:</strong> {{ echipament.utilizator }}</p>
+                    <p><strong>Data Primirii:</strong> 
+    {% if echipament.data_primire %}
+        {{ echipament.data_primire.strftime('%m/%d/%Y') }}
+    {% else %}
+        -
+    {% endif %}
+</p>
+                    
+                    <p><strong>Specificații Tehnice:</strong><br> 
+                       <span class="text-muted">{{ echipament.specificatii }}</span>
+                    </p>
+                    
+                    <p><strong>Software Instalat:</strong><br> 
+                       <span class="text-muted">{{ echipament.software }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <hr>
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5>🛠 Istoric Intervenții</h5>
+                
+                {% if session.get('role') == 'admin' %}
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalInterventie">
+                    + Adaugă Intervenție
+                </button>
+                {% endif %}
+            </div>
+            
+            <table class="table table-bordered table-sm mt-2">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tip</th>
+                        <th>Descriere</th>
+                        <th>Tehnician</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interventie in interventii %}
+                    <tr>
+                        <td>{{ interventie.data_interventie }}</td>
+                        <td>{{ interventie.tip_interventie }}</td>
+                        <td>{{ interventie.descriere }}</td>
+                        <td>{{ interventie.tehnician }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">Nu există intervenții înregistrate.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalInterventie" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Înregistrează Intervenție</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formInterventie">
+            <input type="hidden" id="interventie_echipament_id" value="{{ echipament.id_echipament }}">
+            
+            <div class="mb-3">
+                <label class="form-label">Tip Intervenție</label>
+                <select class="form-select" id="tip_interventie">
+                    <option value="Hardware">Reparație Hardware</option>
+                    <option value="Software">Instalare/Configurare Software</option>
+                    <option value="Mentenanta">Mentenanță Periodică</option>
+                    <option value="Casare">Pregătire Casare</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label">Descriere Detaliată</label>
+                <textarea class="form-control" id="descriere_interventie" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tehnician</label>
+                <input type="text" class="form-control" id="tehnician">
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Renunță</button>
+        <button type="button" class="btn btn-primary" onclick="salveazaInterventie()">Salvează</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function salveazaInterventie() {
+    var data = {
+        id_echipament: document.getElementById('interventie_echipament_id').value,
+        tip_interventie: document.getElementById('tip_interventie').value,
+        descriere: document.getElementById('descriere_interventie').value,
+        tehnician: document.getElementById('tehnician').value
+    };
+
+    fetch('/api/interventii/adauga', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert("Intervenție salvată!");
+        location.reload();
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert("A apărut o eroare!");
+    });
+}
+</script>
+{% endblock %}

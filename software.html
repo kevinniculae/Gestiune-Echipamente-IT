@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">💿 Catalog Software Aprobat</h2>
+<p class="text-muted">Lista aplicațiilor licențiate pentru utilizare în cadrul instituției.</p>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-bordered table-hover">
+            <thead class="table-info">
+                <tr>
+                    <th>Nume Aplicație</th>
+                    <th>Tip Software</th>
+                    <th>Tip Licențiere</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for soft in programe %}
+                <tr>
+                    <td><strong>{{ soft.nume }}</strong></td>
+                    <td>{{ soft.tip }}</td>
+                    <td>{{ soft.licente }}</td>
+                    <td><span class="badge bg-success">Aprobat</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

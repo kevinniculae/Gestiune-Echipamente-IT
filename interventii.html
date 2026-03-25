@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2>🛠 Jurnal Service Global (Intervenții)</h2>
+        <p class="text-muted">Istoricul tuturor reparațiilor și modificărilor din sistem.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Data</th>
+                        <th>Echipament (Nr. Inv)</th>
+                        <th>Tip Intervenție</th>
+                        <th>Descriere</th>
+                        <th>Tehnician</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for interventie in interventii %}
+                    <tr>
+                        <td style="white-space: nowrap;">{{ interventie.data_interventie }}</td>
+                        
+                        <td>
+                            <strong>{{ interventie.echipament_nume }}</strong> 
+                            <span class="text-muted">({{ interventie.nr_inventar }})</span>
+                        </td>
+                        
+                        <td>
+                            {% if interventie.tip_interventie == 'Hardware' %}
+                                <span class="badge bg-danger">Hardware</span>
+                            {% elif interventie.tip_interventie == 'Software' %}
+                                <span class="badge bg-info text-dark">Software</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ interventie.tip_interventie }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ interventie.descriere }}</td>
+                        <td>{{ interventie.tehnician }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Nu există intervenții înregistrate.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

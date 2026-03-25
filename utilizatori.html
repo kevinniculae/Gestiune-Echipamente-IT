@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2>👨‍💼 Gestiune Angajați (Utilizatori Înregistrați)</h2>
+        <p class="text-muted">Lista tuturor conturilor din sistem.</p>
+    </div>
+</div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nume Real</th>
+                    <th>Username</th>
+                    <th>Rol</th>
+                    <th>Echipamente</th>
+                    <th>Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in utilizatori %}
+                <tr>
+                    <td>{{ user.id_utilizator }}</td>
+                    <td><strong>{{ user.nume }}</strong></td>
+                    <td>{{ user.username }}</td>
+                    <td>
+                        {% if user.role == 'admin' %}
+                            <span class="badge bg-danger">ADMIN</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Angajat</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.nr_echipamente > 0 %}
+                            <span class="badge bg-primary">{{ user.nr_echipamente }} echipamente</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.nr_echipamente > 0 %}
+                        <button class="btn btn-sm btn-info text-white" 
+                                data-id="{{ user.id_utilizator }}" 
+                                data-nume="{{ user.nume }}"
+                                onclick="veziEchipamente(this)">
+                            🔍 Vezi Echipamente
+                        </button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">Nu există utilizatori înregistrați.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="modalListaEchipamente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">Echipamente deținute de: <span id="nume_user_titlu"></span></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <table class="table table-bordered table-sm">
+                <thead>
+                    <tr>
+                        <th>Denumire</th>
+                        <th>Nr. Inventar</th>
+                        <th>Tip</th>
+                    </tr>
+                </thead>
+                <tbody id="lista_body">
+                    </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Închide</button>
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+function veziEchipamente(elem) {
+    var id = elem.getAttribute('data-id');
+    var nume = elem.getAttribute('data-nume');
+    document.getElementById('nume_user_titlu').innerText = nume;
+    var tbody = document.getElementById('lista_body');
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center text-primary">⏳ Se încarcă datele...</td></tr>';
+    var modal = new bootstrap.Modal(document.getElementById('modalListaEchipamente'));
+    modal.show();
+    fetch('/api/utilizator/' + id + '/echipamente')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Eroare de rețea sau ruta lipseste!");
+        }
+        return response.json();
+    })
+    .then(data => {
+        tbody.innerHTML = '';
+        
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">Acest angajat nu are niciun echipament alocat.</td></tr>';
+            return;
+        }
+        data.forEach(item => {
+            var row = '<tr>' +
+                '<td>' + item.denumire + '</td>' +
+                '<td><strong>' + item.nr_inventar + '</strong></td>' +
+                '<td>' + item.tip + '</td>' +
+            '</tr>';
+            tbody.innerHTML += row;
+        });
+    })
+    .catch(error => {
+        console.error("Eroare:", error);
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">❌ Eroare la încărcare. Verifică app.py!</td></tr>';
+    });
+}
+</script>
+{% endblock %}

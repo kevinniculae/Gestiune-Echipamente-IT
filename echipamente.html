@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row mb-4">
+        <div class="col-8">
+            <h2>🖥 Evidența Echipamentelor IT</h2>
+        </div>
+        <div class="col-4 text-end">
+           <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">
+                <i class="fas fa-plus"></i> + Adaugă Echipament Nou
+            </button>
+        </div>
+    </div>
+
+    <div class="card p-3 mb-4 shadow-sm">
+        <h5 class="mb-3">⚙️ Filtre Avansate și Căutare</h5>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label for="filterTip" class="form-label">Tip</label>
+                <select id="filterTip" class="form-select">
+                    <option value="">Toate</option>
+                    <option value="Laptop">Laptop</option>
+                    <option value="PC">PC</option>
+                    <option value="Imprimanta">Imprimantă</option>
+                    <option value="Server">Server</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="filterLocatie" class="form-label">Locație</label>
+                <select id="filterLocatie" class="form-select">
+                    <option value="">Toate</option>
+                    {% for loc in locatii %}
+                        <option value="{{ loc.id_locatie }}">{{ loc.denumire }} ({{ loc.camera }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 mb-3">
+                <label for="filterStatus" class="form-label">Status</label>
+                <select id="filterStatus" class="form-select">
+                    <option value="">Toate</option>
+                    <option value="1">Activ/În Producție</option>
+                    <option value="0">Inactiv/Defect</option>
+                </select>
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button class="btn btn-primary w-100" id="btnAplicaFiltre">Aplică Filtre</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-3 shadow-sm">
+        <div class="table-responsive">
+            <table id="tabelEchipamente" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Nr. Inventar</th>
+                        <th>Denumire</th>
+                        <th>Tip</th>
+                        <th>Locație</th>
+                        <th>Utilizator</th>
+                        <th>Status</th>
+                        <th>Acțiuni</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Adaugă Echipament Nou</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formAdaugare">
+          <div class="mb-3">
+            <label class="form-label">Denumire</label>
+            <input type="text" class="form-control" name="denumire" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Număr Inventar</label>
+            <input type="text" class="form-control" name="nr_inventar" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tip</label>
+            <select class="form-select" name="tip">
+                <option value="Laptop">Laptop</option>
+                <option value="PC">PC</option>
+                <option value="Imprimanta">Imprimantă</option>
+                <option value="Server">Server</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Modalitate Dobândire</label>
+            <select class="form-select" name="modalitate_dobandire">
+                <option value="Achizitie">Achiziție (Fonduri Proprii)</option>
+                <option value="Proiect UE">Fonduri Europene</option>
+                <option value="Donatie">Donație / Transfer</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Data Primirii</label>
+            <input type="date" class="form-control" name="data_primire">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Specificații Tehnice</label>
+            <textarea class="form-control" name="specificatii" rows="2"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Software Instalat</label>
+            <textarea class="form-control" name="software" rows="2"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Locație</label>
+            <select class="form-select" name="locatie_id">
+                {% for loc in locatii %}
+                    <option value="{{ loc.id_locatie }}">{{ loc.denumire }} ({{ loc.camera }})</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Utilizator</label>
+            <select class="form-select" name="utilizator_id">
+                {% for user in utilizatori %}
+                    <option value="{{ user.id_utilizator }}">{{ user.nume }}</option>
+                {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Renunță</button>
+        <button type="button" class="btn btn-primary" onclick="salveazaEchipament()">Salvează</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-warning">
+        <h5 class="modal-title">Modifică Echipament</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="formEditare">
+          <input type="hidden" id="edit_id">
+
+          <div class="mb-3">
+            <label class="form-label">Denumire</label>
+            <input type="text" class="form-control" id="edit_denumire">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Număr Inventar</label>
+            <input type="text" class="form-control" id="edit_nr_inventar">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tip</label>
+            <select class="form-select" id="edit_tip">
+                <option value="Laptop">Laptop</option>
+                <option value="PC">PC</option>
+                <option value="Imprimanta">Imprimantă</option>
+                <option value="Server">Server</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Modalitate Dobândire</label>
+            <select class="form-select" id="edit_modalitate">
+                <option value="Achizitie">Achiziție (Fonduri Proprii)</option>
+                <option value="Proiect UE">Fonduri Europene</option>
+                <option value="Donatie">Donație / Transfer</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Data Primirii</label>
+            <input type="date" class="form-control" id="edit_data_primire">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Specificații</label>
+            <textarea class="form-control" id="edit_specificatii" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Software Instalat</label>
+            <textarea class="form-control" id="edit_software" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Locație</label>
+            <select class="form-select" id="edit_locatie">
+                {% for loc in locatii %}
+                    <option value="{{ loc.id_locatie }}">{{ loc.denumire }}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Utilizator</label>
+            <select class="form-select" id="edit_utilizator">
+                {% for user in utilizatori %}
+                    <option value="{{ user.id_utilizator }}">{{ user.nume }}</option>
+                {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Status Echipament</label>
+            <select class="form-select" id="edit_status">
+                <option value="1">✅ Activ / În Producție</option>
+                <option value="0">❌ Inactiv / Defect / Casat</option>
+            </select>
+          </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Renunță</button>
+        <button type="button" class="btn btn-primary" onclick="salveazaModificarile()">Salvează Modificările</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+
+function salveazaEchipament() {
+    var formData = {
+        denumire: $('input[name="denumire"]').val(),
+        nr_inventar: $('input[name="nr_inventar"]').val(),
+        tip: $('select[name="tip"]').val(),
+        modalitate_dobandire: $('select[name="modalitate_dobandire"]').val(),
+        data_primire: $('input[name="data_primire"]').val(), // NOU
+        specificatii: $('textarea[name="specificatii"]').val(),
+        software: $('textarea[name="software"]').val(),
+        locatie_id: $('select[name="locatie_id"]').val(),
+        utilizator_id: $('select[name="utilizator_id"]').val()
+    };
+
+    $.ajax({
+        url: '/api/echipamente/adauga',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function(response) {
+            alert("Echipament adăugat cu succes!");
+            $('#addModal').modal('hide');
+            $('#formAdaugare')[0].reset();
+            $('#tabelEchipamente').DataTable().ajax.reload();
+        },
+        error: function(xhr, status, error) {
+            alert("Eroare la salvare: " + xhr.responseText);
+        }
+    });
+}
+
+function deschideEditare(id) {
+    $.get('/api/echipament/info/' + id, function(data) {
+        $('#edit_id').val(data.id_echipament);
+        $('#edit_denumire').val(data.denumire);
+        $('#edit_nr_inventar').val(data.nr_inventar);
+        $('#edit_tip').val(data.tip);
+        $('#edit_modalitate').val(data.modalitate_dobandire);
+        $('#edit_data_primire').val(data.data_primire); // NOU
+        $('#edit_specificatii').val(data.specificatii);
+        $('#edit_software').val(data.software);
+        $('#edit_locatie').val(data.locatie_id);
+        $('#edit_utilizator').val(data.utilizator_id);
+        $('#edit_status').val(data.activ); 
+        $('#editModal').modal('show');
+    }).fail(function() {
+        alert("Eroare la încărcarea datelor. Verifică consola (F12) sau app.py.");
+    });
+}
+
+function salveazaModificarile() {
+    var id = $('#edit_id').val();
+    
+    var formData = {
+        denumire: $('#edit_denumire').val(),
+        nr_inventar: $('#edit_nr_inventar').val(),
+        tip: $('#edit_tip').val(),
+        modalitate_dobandire: $('#edit_modalitate').val(),
+        data_primire: $('#edit_data_primire').val(), // NOU
+        specificatii: $('#edit_specificatii').val(),
+        software: $('#edit_software').val(),
+        locatie_id: $('#edit_locatie').val(),
+        utilizator_id: $('#edit_utilizator').val(),
+        activ: $('#edit_status').val()
+    };
+
+    $.ajax({
+        url: '/api/echipamente/modifica/' + id,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function(response) {
+            alert("Modificare reușită!");
+            $('#editModal').modal('hide');
+            $('#tabelEchipamente').DataTable().ajax.reload();
+        },
+        error: function(xhr) {
+            alert("Eroare: " + xhr.responseText);
+        }
+    });
+}
+</script>
+
+{% endblock %}

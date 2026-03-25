@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">📍 Lista Locațiilor</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Denumire Clădire/Sediu</th>
+                    <th>Cameră / Etaj</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loc in locatii %}
+                <tr>
+                    <td>{{ loc.id_locatie }}</td>
+                    <td><strong>{{ loc.denumire }}</strong></td>
+                    <td>{{ loc.camera }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3">Nu există locații definite.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
